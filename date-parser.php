@@ -41,6 +41,39 @@ class FuzzyDateParser {
 	 * @return FuzzyDateParser
 	 */
 	public function parse( $text ) {
+		if ( preg_match( '/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/', $text ) ) {
+			// MM/DD/YYYY
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2} [a-zA-Z]{3,9} [0-9]{4}/', $text ) ) {
+			// DD Month YYYY
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[a-zA-Z]{3,9} [0-9]{1,2},? [0-9]{4}/', $text ) ) {
+			// Month DD, YYYY
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2} [0-9]{1,2} [0-9]{4}/', $text ) ) {
+			// MM DD YYYY
+			$text = str_replace( ' ', '/', $text );
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2}-[0-9]{1,2}-[0-9]{4}/', $text ) ) {
+			// MM DD YYYY
+			$text = str_replace( '-', '/', $text );
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{8}/', $text ) ) {
+			// MMDDYYYY
+			$text = substr( $text, 0, 2 ) . '/' . substr( $text, 2, 2 ) . '/' . substr( $text, 4 );
+			return $this->standard_parse( $text );
+		}
+$this->hasFailed = true;
+		return $this;
+	}
+
+	/**
+	 * Standard `date_parse` wrapper
+	 *
+	 * @param $text
+	 * @return FuzzyDateParser
+	 */
+	protected function standard_parse( $text ) {
 		static $ignoredErrors = array(
 			'The timezone could not be found in the database',
 		);
