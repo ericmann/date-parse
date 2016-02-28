@@ -41,6 +41,8 @@ class FuzzyDateParser {
 	 * @return FuzzyDateParser
 	 */
 	public function parse( $text ) {
+		$current = (int) date( 'y' );
+
 		if ( preg_match( '/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}/', $text ) ) {
 			// MM/DD/YYYY
 			return $this->standard_parse( $text );
@@ -62,8 +64,56 @@ class FuzzyDateParser {
 			// MMDDYYYY
 			$text = substr( $text, 0, 2 ) . '/' . substr( $text, 2, 2 ) . '/' . substr( $text, 4 );
 			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2}/', $text ) ) {
+			// MM/DD/YY
+			$year = (int) substr( $text, -2 );
+			if ( $year > $current ) {
+				$year += 1900;
+			} else {
+				$year += 2000;
+			}
+
+			$text = substr( $text, 0, -2 ) . $year;
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2} [0-9]{1,2} [0-9]{2}/', $text ) ) {
+			// MM DD YY
+			$year = (int) substr( $text, -2 );
+			if ( $year > $current ) {
+				$year += 1900;
+			} else {
+				$year += 2000;
+			}
+
+			$text = substr( $text, 0, -2 ) . $year;
+			$text = str_replace( ' ', '/', $text );
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{1,2}-[0-9]{1,2}-[0-9]{2}/', $text ) ) {
+			// MM-DD-YY
+			$year = (int) substr( $text, -2 );
+			if ( $year > $current ) {
+				$year += 1900;
+			} else {
+				$year += 2000;
+			}
+
+			$text = substr( $text, 0, -2 ) . $year;
+			$text = str_replace( '-', '/', $text );
+			return $this->standard_parse( $text );
+		} else if ( preg_match( '/[0-9]{6}/', $text ) ) {
+			// MMDDYY
+			$year = (int) substr( $text, -2 );
+			if ( $year > $current ) {
+				$year += 1900;
+			} else {
+				$year += 2000;
+			}
+
+			$text = substr( $text, 0, 2 ) . '/' . substr( $text, 2, 2 ) . '/' . $year;
+			return $this->standard_parse( $text );
 		}
-$this->hasFailed = true;
+
+		// If we're this far, then parsing has failed
+		$this->hasFailed = true;
 		return $this;
 	}
 
