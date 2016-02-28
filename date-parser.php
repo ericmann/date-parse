@@ -4,6 +4,19 @@
  * Convenience wrapper around `date_parse` to support fuzzy matching against
  * arbitrary date formats used by humans and not recognized by machines.
  *
+ * This class will parse dates in the following formats:
+ * - n/j/y
+ * - n/j/Y
+ * - n-j-y
+ * - n-j-Y
+ * - n j y
+ * - n j Y
+ * - mdy
+ * - mdY
+ * - j M Y
+ * - M j, Y
+ *
+ *
  * @author Eric Mann <eric@eamann.com>
  *
  * @property-read array $result
